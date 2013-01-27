@@ -1,20 +1,29 @@
 #!/bin/sh
 awk '
 BEGIN {
-FS=","
+    FS=","
 }
 {
-if (NR==2) {mintemp=$3}
+    if (NR==2) {mintemp=$3}
 }
 END {
-maxtemp=$3
-step=int(255/(maxtemp-mintemp))
-for (i=mintemp;i<=maxtemp;i++){
-if (i==maxtemp) {
-    print i ":" (i-mintemp)*step
-} else {
-    print i ":" (i-mintemp)*step ","
-}
-}
+    maxtemp=$3
+    step=int(127/(maxtemp-0))
+    for (i=mintemp;i<=maxtemp;i++){
+
+    if (i>0) {
+	if (i==maxtemp) {
+	    print i ":" 127+(i)*step
+	} else {
+	    print i ":" 127+(i)*step ","
+	}
+    } else {
+	if (i==maxtemp) {
+	    print i ":" 0
+	} else {
+	    print i ":" 0 ","
+	}
+    }
+    }
 }
 '

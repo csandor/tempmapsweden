@@ -14,5 +14,5 @@ cat end.part>>data/new/temps_raster.vrt
 /usr/local/bin/gdalwarp -t_srs epsg:3785 -of GTiff -co "TILED=YES" -r bilinear data/new/temps_raster.vrt data/new/temps_recolor.tiff
 /usr/local/bin/gdaladdo -r average data/new/temps_recolor.tiff 2 4 8 16 32 64 128 256 512 1024
 /usr/local/bin/gdal_contour -a temp data/new/temps.tiff data/new/temps_contour.shp -i 1.0
-/usr/local/bin/ogr2ogr -f "ESRI Shapefile" -s_srs epsg:4326 -t_srs epsg:3785 data/new/temps_contour_gm.shp data/new/temps_contour.shp
+/usr/local/bin/ogr2ogr -f "ESRI Shapefile" -s_srs epsg:4326 -t_srs epsg:3785 -sql "SELECT CAST(temp AS Integer) FROM temps_contour" data/new/temps_contour_gm.shp data/new/temps_contour.shp
 mv -f data/new/* data/
