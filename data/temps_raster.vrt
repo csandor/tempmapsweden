@@ -1,0 +1,134 @@
+<VRTDataset rasterXSize="1000" rasterYSize="1000">
+  <SRS>GEOGCS[&quot;WGS 84&quot;,DATUM[&quot;WGS_1984&quot;,SPHEROID[&quot;WGS 84&quot;,6378137,298.257223563,AUTHORITY[&quot;EPSG&quot;,&quot;7030&quot;]],AUTHORITY[&quot;EPSG&quot;,&quot;6326&quot;]],PRIMEM[&quot;Greenwich&quot;,0],UNIT[&quot;degree&quot;,0.0174532925199433],AUTHORITY[&quot;EPSG&quot;,&quot;4326&quot;]]</SRS>
+    <GeoTransform> 1.1039999999999999e+001, 1.3220000000000003e-002, 0.0000000000000000e+000, 5.5240000000000002e+001, 0.0000000000000000e+000, 1.3889999999999993e-002</GeoTransform>
+      <Metadata>
+          <MDI key="AREA_OR_POINT">Area</MDI>
+            </Metadata>
+              <VRTRasterBand dataType="Byte" band="1">
+                  <ColorInterp>Red</ColorInterp>
+                      <ComplexSource>
+                            <SourceFilename relativeToVRT="1">temps.tiff</SourceFilename>
+                                  <SourceBand>1</SourceBand>
+                                        <LUT>-31:0,
+-30:7,
+-29:14,
+-28:21,
+-27:28,
+-26:35,
+-25:42,
+-24:49,
+-23:56,
+-22:63,
+-21:70,
+-20:77,
+-19:84,
+-18:91,
+-17:98,
+-16:105,
+-15:112,
+-14:119,
+-13:126,
+-12:133,
+-11:140,
+-10:147,
+-9:154,
+-8:161,
+-7:168,
+-6:175,
+-5:182,
+-4:189,
+-3:196,
+-2:203,
+-1:210,
+0:217,
+1:224,
+2:231
+      </LUT>
+          </ComplexSource>
+            </VRTRasterBand>
+              <VRTRasterBand dataType="Byte" band="2">
+                  <ColorInterp>Green</ColorInterp>
+                      <ComplexSource>
+                            <SourceFilename relativeToVRT="1">temps.tiff</SourceFilename>
+                                  <SourceBand>1</SourceBand>
+                                        <LUT>-31:0,
+-30:0,
+-29:0,
+-28:0,
+-27:0,
+-26:0,
+-25:0,
+-24:0,
+-23:0,
+-22:0,
+-21:0,
+-20:0,
+-19:0,
+-18:0,
+-17:0,
+-16:0,
+-15:0,
+-14:0,
+-13:0,
+-12:0,
+-11:0,
+-10:0,
+-9:0,
+-8:0,
+-7:0,
+-6:0,
+-5:0,
+-4:0,
+-3:0,
+-2:0,
+-1:0,
+0:0,
+1:0,
+2:0
+     </LUT>
+         </ComplexSource>
+           </VRTRasterBand>  
+             <VRTRasterBand dataType="Byte" band="3">
+                 <ColorInterp>Blue</ColorInterp>
+                     <ComplexSource>
+                           <SourceFilename relativeToVRT="1">temps.tiff</SourceFilename>
+                                 <SourceBand>1</SourceBand>
+                                       <LUT>-31:255,
+-30:248,
+-29:241,
+-28:234,
+-27:227,
+-26:220,
+-25:213,
+-24:206,
+-23:199,
+-22:192,
+-21:185,
+-20:178,
+-19:171,
+-18:164,
+-17:157,
+-16:150,
+-15:143,
+-14:136,
+-13:129,
+-12:122,
+-11:115,
+-10:108,
+-9:101,
+-8:94,
+-7:87,
+-6:80,
+-5:73,
+-4:66,
+-3:59,
+-2:52,
+-1:45,
+0:38,
+1:31,
+2:24
+      </LUT>
+          </ComplexSource>
+            </VRTRasterBand>
+            </VRTDataset>
+            

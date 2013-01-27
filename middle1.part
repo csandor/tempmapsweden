@@ -1,0 +1,9 @@
+      </LUT>
+          </ComplexSource>
+            </VRTRasterBand>
+              <VRTRasterBand dataType="Byte" band="2">
+                  <ColorInterp>Green</ColorInterp>
+                      <ComplexSource>
+                            <SourceFilename relativeToVRT="1">temps.tiff</SourceFilename>
+                                  <SourceBand>1</SourceBand>
+                                        <LUT>

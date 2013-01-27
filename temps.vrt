@@ -1,0 +1,11 @@
+<OGRVRTDataSource>
+    <OGRVRTLayer name="temps">
+            <SrcDataSource>data/temps.csv</SrcDataSource> 
+            <GeometryType>wkbPoint</GeometryType> 
+            <GeometryField encoding="PointFromColumns" x="x" y="y" z="z"/> 
+            <LayerSRS>WGS84</LayerSRS>
+            <Field name="x" type="Real" />
+            <Field name="y" type="Real" />
+            <Field name="z" type="Integer" />
+    </OGRVRTLayer>
+</OGRVRTDataSource>

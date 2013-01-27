@@ -1,0 +1,101 @@
+MAP
+
+NAME "Sweden Temperatures"
+STATUS ON
+SIZE 2048 2048
+#SYMBOLSET ../etc/symbols.sym
+EXTENT 1228967.178 7408079.864 2700154.132 10791288.160
+UNITS METERS
+SHAPEPATH "../data"
+IMAGECOLOR 255 255 255
+FONTSET ../mapfiles/fonts.txt
+IMAGETYPE PNG24
+
+WEB
+  IMAGEPATH "/tmp/ms_tmp/"
+  IMAGEURL "/ms_tmp/"
+  METADATA
+    "wms_title"     "Sweden Temperatures WMS"  ##required
+    "wms_onlineresource" "http://viamap.dyndns.org:81/cgi-bin/mapservEcw?map=/home/viamap/temperature/temps.map"   ##required
+    "wms_srs"       "EPSG:3857 EPSG:900913"  ##recommended
+  END
+END
+
+PROJECTION
+  "init=epsg:3785"   ##required
+END
+OUTPUTFORMAT
+    NAME 'PNG24'
+    DRIVER AGG/PNG
+    IMAGEMODE RGB
+END
+#
+# Start of layer definitions
+#
+
+LAYER
+       NAME sweden_temps
+       TYPE RASTER
+       STATUS ON
+       DUMP TRUE
+       DATA "/home/viamap/temperature/data/temps_recolor.tiff"
+       PROJECTION
+           "init=epsg:900913"
+       END
+
+
+       METADATA
+           "wms_title"             "Sweden Temperatures Map"
+           "wms_srs"               "EPSG:3857 EPSG:900913"
+           "wms_name"              "sweden_temps"
+           "wms_format"            "image/png image/jpeg"
+           "wms_extent"            "1228967.178 7408079.864 2700154.132 10791288.160"
+           "wms_onlineresource"    "http://viamap.dyndns.org:81/cgi-bin/mapservEcw?map=/home/viamap/temperature/temps.map"
+       END
+
+       CLASS
+           NAME "sweden_temps"
+           COLOR 255 0 0
+       END
+END #Layer
+LAYER
+NAME sweden_temps_iso
+STATUS ON
+TYPE LINE
+DATA "/home/viamap/temperature/data/temps_contour_gm.shp"
+TRANSPARENCY ALPHA
+LABELITEM "temp"
+METADATA
+    "wms_title"             "Sweden Temperatures Map Isolines"
+    "wms_srs"               "EPSG:3857 EPSG:900913"
+    "wms_name"              "sweden_temps"
+    "wms_format"            "image/png image/jpeg"
+    "wms_extent"            "1228967.178 7408079.864 2700154.132 10791288.160"
+    "wms_onlineresource"    "http://viamap.dyndns.org:81/cgi-bin/mapservEcw?map=/home/viamap/temperature/temps.map"
+END
+
+CLASS
+STYLE
+    COLOR 150 150 150
+    WIDTH 1
+    ANTIALIAS TRUE
+END
+LABEL
+COLOR  0 0 0
+OUTLINECOLOR 255 255 255
+OUTLINEWIDTH 1
+FONT "verdana-bold"
+BUFFER 4
+TYPE truetype
+SIZE 6
+ANGLE follow
+POSITION AUTO
+PARTIALS TRUE
+ANTIALIAS TRUE
+REPEATDISTANCE 120
+END
+END
+END
+
+END # Map File
+
