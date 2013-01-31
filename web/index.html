@@ -1,19 +1,140 @@
 <!DOCTYPE html>
 <html>
     <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
         <title>Temperature Map Sweden</title>
-        <link rel="stylesheet" href="OpenLayers/theme/default/style.css" type="text/css">
-        <link rel="stylesheet" href="OpenLayers/theme/default/google.css" type="text/css">
-		<link rel="stylesheet" href="style.css" type="text/css">
+		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
+		<link rel="stylesheet" href="css/leaflet.rrose.css" />
+		<link rel="stylesheet" href="css/MarkerCluster.css" />
+		<link rel="stylesheet" href="css/MarkerCluster.Default.css" />
+		<!--[if lte IE 8]>
+			<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
+			<link rel="stylesheet" href="leaflet.rrose.ie.css" />
+			<link rel="stylesheet" href="MarkerCluster.Default.ie.css" />
+		<![endif]-->
+		<script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
         <script src="http://maps.google.com/maps/api/js?v=3&amp;sensor=false"></script>
-        <script src="OpenLayers/OpenLayers.js"></script>
-        <script src="initMap.js"></script>
+		<script src="js/leaflet-google.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+		<script src="js/rrose-src.js"></script>
+		<script src="js/leaflet.markercluster.js"></script>
+		
+		<style>
+			#map {height:500px;}
+			
+			.marker-cluster {
+				width: 20px;
+				height: 20px;
+				background-color: rgba(181, 226, 140, 0.6);
+				text-align: center;
+				font-weight: bold;
+				font-size: 12px;
+				-moz-border-radius: 20px;
+				border-radius: 20px;
+				margin-left: 4px;
+				margin-top: 10px;
+			}
+		</style>
+		
+		<script type="text/javascript">
+			var map,googleLayer,tempLayer,tempPoints,markers;
+			function init(){
+			    map = new L.Map('map', {
+					center: [62.67,17.65],
+					zoom: 4
+				});
+			    googleSatLayer = new L.Google('SATELLITE');
+				map.addLayer(googleSatLayer);
+				googleLayer = new L.Google('ROADMAP');
+				map.addLayer(googleLayer);
+				tempLayer = L.tileLayer.wms("http://viamap.dyndns.org:81/cgi-bin/mapservEcw?map=/home/viamap/temperature/temps.map", {
+					layers:  'sweden_temps,sweden_temps_iso',
+					format:'image/png; mode=24bit',
+					transparent:'true',
+					opacity:0.8
+				});
+				map.addLayer(tempLayer);
+				
+				markers = new L.MarkerClusterGroup({
+					maxClusterRadius: 50,
+					iconCreateFunction: function (cluster) {
+						var sumTemp=0;
+						for (i=0;i<cluster.getAllChildMarkers().length;i++){
+							sumTemp+=parseInt(cluster.getAllChildMarkers()[i].feature.properties.temperature);
+						}
+						var clusterTemp=(Math.round(sumTemp/cluster.getAllChildMarkers().length)).toString();
+						//console.log(clusterTemp);
+						return new L.DivIcon({ html: "<div>"+clusterTemp+"</div>", className: 'marker-cluster', iconSize: new L.Point(40, 40) });
+					},
+					//Disable all of the defaults:
+					spiderfyOnMaxZoom: false, showCoverageOnHover: false, zoomToBoundsOnClick: true, singleMarkerMode:true
+				});
+				
+				//load the geojson
+				$.getJSON( "http://viamap.dyndns.org:81/temps/temps.json",
+						function(data){
+							tempPoints=L.geoJson(data, {
+								pointToLayer: function (feature, latlng) {
+									var myIcon = L.icon({
+										iconUrl: 'http://www.temperatur.nu/gmapv3/icons.php?temperatur='+feature.properties.temperature,
+										iconSize: [25, 25],
+										iconAnchor: [12,1],
+										popupAnchor: [0, -2]
+									});				
+									return L.marker(latlng, {icon: myIcon});
+								},
+							    onEachFeature: function (feature, layer) {
+							    	var popupContent=feature.properties.name+"<br/>"+feature.properties.temperature+" &#8451;";
+				                    layer.on('mouseover', function(e){
+				                        var hover_bubble = new L.Rrose({ offset: new L.Point(0,-10), closeButton: false, autoPan: false })
+				                          .setContent(popupContent)
+				                          .setLatLng(layer._latlng)
+				                          .openOn(map);
+				                    });
+				                    layer.on('mouseout', function(e){ map.closePopup() });
+				                    
+							    	markers.addLayer(layer);
+				                    
+							    }
+							});
+							map.addLayer(markers);
+							markers.on('clustermouseover', function (a) {
+								//console.log(a);
+								var html="";
+								if (a.layer.getAllChildMarkers().length<5) {
+									var c=a.layer.getAllChildMarkers().length;
+								} else {
+									var c=5;
+								}
+								for (i=0;i<c;i++){
+									html+=a.layer.getAllChildMarkers()[i].feature.properties.name+":&nbsp;"+a.layer.getAllChildMarkers()[i].feature.properties.temperature+"&nbsp;&#8451<br/>";
+								}
+								html +="...";
+								console.log(html);
+		                        var hover_bubble = new L.Rrose({ offset: new L.Point(0,-10), closeButton: false, autoPan: false })
+		                          .setContent(html)
+		                          .setLatLng(a.layer._latlng)
+		                          .openOn(map);
+								
+							});
+							markers.on('clustermouseout', function(e){ map.closePopup() });
+							var baseMaps = {
+									"Google Satellite": googleSatLayer,
+									"Google Streets": googleLayer
+								    
+								};
+
+							var overlayMaps = {
+							    "Heatmap": tempLayer
+							    ,"Temperature points": tempPoints
+							};
+							L.control.layers(baseMaps, overlayMaps).addTo(map);
+						}
+				);	
+			}
+		</script>
     </head>
     <body onload="init()">
         <h1 id="title">Temperature Map Sweden</h1>
-        <div id="map" class="smallmap"></div>
+        <div id="map"></div>
     </body>
 </html>
