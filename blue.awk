@@ -8,10 +8,10 @@ BEGIN {
 }
 END {
     maxtemp=$3
-    step=int(200/(5-mintemp))
+    step=int(255/(0-mintemp))
     for (i=mintemp;i<=maxtemp;i++){
 
-    if (i<5) {
+    if (i<0) {
 	if (i==maxtemp) {
 	    print i ":" 255-(i-mintemp)*step
 	} else {
