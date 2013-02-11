@@ -1,5 +1,8 @@
 
-#map {height:500px;}
+#map, #container {
+	height: 700px;
+	width: 785px;
+}
 
 .marker-cluster{
 	background-color: rgba(94, 181, 0, 0.6);
@@ -18,4 +21,29 @@
 	border-radius: 20px;
 	margin-left: 4px;
 	margin-top: 10px;*/
+}
+
+#mapinfo .dataPane {
+	float: right;
+	clear: right;
+}
+
+#mapinfo .graph{
+	float:left;
+}
+#mapinfo img{
+	margin-top: 5px;
+	margin-bottom: 5px;
+	margin-left: 2px;
+	margin-right: 2px;
+	vertical-align:middle;
+	
+}
+
+#mapinfo p{
+	font-size: 0.8em;
+}
+
+.ui-widget, .ui-tooltip-content {
+	font-size: 0.6em;
 }

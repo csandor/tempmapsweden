@@ -6,9 +6,9 @@ SIZE 2048 2048
 #SYMBOLSET ../etc/symbols.sym
 EXTENT 1228967.178 7408079.864 2700154.132 10791288.160
 UNITS METERS
-SHAPEPATH "../data"
+SHAPEPATH "data"
 IMAGECOLOR 255 255 255
-FONTSET ../mapfiles/fonts.txt
+FONTSET fonts/fonts.txt
 IMAGETYPE PNG24
 
 WEB
@@ -22,7 +22,7 @@ WEB
 END
 
 PROJECTION
-  "init=epsg:3785"   ##required
+  "init=epsg:3857"   ##required
 END
 OUTPUTFORMAT
     NAME 'PNG24'
@@ -38,7 +38,7 @@ LAYER
        TYPE RASTER
        STATUS ON
        DUMP TRUE
-       DATA "/home/viamap/temperature/data/temps_recolor.tiff"
+       DATA "data/temps_recolor.tiff"
        PROJECTION
            "init=epsg:900913"
        END
@@ -46,11 +46,11 @@ LAYER
 
        METADATA
            "wms_title"             "Sweden Temperatures Map"
-           "wms_srs"               "EPSG:3857 EPSG:900913"
+           "wms_srs"               "EPSG:3857 EPSG:3785"
            "wms_name"              "sweden_temps"
            "wms_format"            "image/png image/jpeg"
            "wms_extent"            "1228967.178 7408079.864 2700154.132 10791288.160"
-           "wms_onlineresource"    "http://viamap.dyndns.org:81/cgi-bin/mapservEcw?map=/home/viamap/temperature/temps.map"
+           "wms_onlineresource"    "http://www.temperatur.nu/cgi-bin/mapserv?map=/var/mapdata/temps.map"
        END
 
        CLASS
@@ -62,16 +62,16 @@ LAYER
 NAME sweden_temps_iso
 STATUS ON
 TYPE LINE
-DATA "/home/viamap/temperature/data/temps_contour_gm.shp"
+DATA "data/temps_contour_gm.shp"
 TRANSPARENCY ALPHA
 LABELITEM "temp"
 METADATA
     "wms_title"             "Sweden Temperatures Map Isolines"
-    "wms_srs"               "EPSG:3857 EPSG:900913"
+    "wms_srs"               "EPSG:3857 EPSG:3785"
     "wms_name"              "sweden_temps"
     "wms_format"            "image/png image/jpeg"
     "wms_extent"            "1228967.178 7408079.864 2700154.132 10791288.160"
-    "wms_onlineresource"    "http://viamap.dyndns.org:81/cgi-bin/mapservEcw?map=/home/viamap/temperature/temps.map"
+    "wms_onlineresource"    "http://www.temperatur.nu/cgi-bin/mapserv?map=/var/mapdata/temps.map"
 END
 
 CLASS
