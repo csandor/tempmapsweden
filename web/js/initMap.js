@@ -1,9 +1,10 @@
 var map,googleLayer,tempLayer,tempPoints,markers;
 
 function init(){
-
-	$( document ).tooltip();
-
+	
+	$(function (){
+		$( document ).tooltip();	
+	});
 	
     map = new L.Map('map', {
 		center: mapCenter,
@@ -96,6 +97,7 @@ function init(){
 				map.addControl(new L.Control.Permalink({text: '<img title="Ger dig tillgång till en url som leder till aktuell vy" src="images/book.png"/>', layers: layers, position:'bottomright'}));
 				map.addControl(new L.Control.Attribution({prefix:'<a href="javascript:saveExtent()"><img id="setCookie" title="Sparar aktuell vy och gör sätter kartsidan till startsida på temperatur.nu" src="images/plus.png"/></a>', position:'bottomright'}));
 				map.addControl(new L.Control.Attribution({prefix:'<a href="javascript:unSetExtent()"><img id="unSetCookie" title="Tar bort sparad vy kartan som startsida." src="images/minus.png"/></a>', position:'bottomright'}));
+				map.addControl(new L.Control.Attribution({prefix:'<a href="javascript:openLegend()"><img id="openLegend" title="Öppen legend" src="images/list1.png"/></a>', position:'bottomright'}));
 				loadExtent();
 			}
 	);
@@ -141,3 +143,10 @@ function loadExtent(){
 function unSetExtent(){
 	$.removeCookie('extent');
 }
+
+
+function openLegend(){
+	$("#legend").css("visibility","visible");
+	$( "#legend" ).dialog({width: 180, resizable:false, position:{my:"right top", at:"right top+10%", of:"#map"}});
+}
+

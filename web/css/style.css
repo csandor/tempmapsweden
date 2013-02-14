@@ -47,3 +47,21 @@
 .ui-widget, .ui-tooltip-content {
 	font-size: 0.6em;
 }
+
+#legend div{
+	font-size: 0.6em;
+}
+
+#legend div:nth-child(odd){
+	float:left;
+	clear:left;
+	text-align:center;
+	width:10em;
+}
+
+#legend div:nth-child(even){
+	float:right;
+	clear:right;
+	width:2em;
+	height:1em;
+}
