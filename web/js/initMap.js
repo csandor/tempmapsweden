@@ -12,7 +12,7 @@ function init(){
     googleSatLayer = new L.Google('SATELLITE');
 	//map.addLayer(googleSatLayer);
 	googleLayer = new L.Google('ROADMAP');
-	//map.addLayer(googleLayer);ű
+	map.addLayer(googleLayer);
 	googleHybridLayer = new L.Google('HYBRID');
 	tempLayer = L.tileLayer.wms(baseDomainUrl+mapserverExecutable+"?map="+mapFileLocation, {
 		layers:  'sweden_temps,sweden_temps_iso',
@@ -127,11 +127,11 @@ function updateInfo(feature){
 function saveExtent(){
 	var sw="[["+map.getBounds()._southWest.lat+","+map.getBounds()._southWest.lng+"]";
 	var ne="["+map.getBounds()._northEast.lat+","+map.getBounds()._northEast.lng+"]]";
-	$.cookie("extent__", sw+","+ne,{ expires: 100, path: '/temps/' });
+	$.cookie("extent", sw+","+ne,{ expires: 100 });
 }
 
 function loadExtent(){	
-	var extent=$.cookie("extent__");
+	var extent=$.cookie("extent");
 	if(eval(extent)){
 		map.fitBounds(eval(extent));
 	}	
@@ -139,5 +139,5 @@ function loadExtent(){
 
 
 function unSetExtent(){
-	$.removeCookie('extent__', { path: '/temps/' });
+	$.removeCookie('extent');
 }
