@@ -1,4 +1,4 @@
-var map,googleLayer,tempLayer,tempPoints,markers;
+var map,googleLayer,tempLayer,tempPoints,markers,layers;
 
 function init(){
 	
@@ -13,10 +13,10 @@ function init(){
     googleSatLayer = new L.Google('SATELLITE');
 	//map.addLayer(googleSatLayer);
 	googleLayer = new L.Google('ROADMAP');
-	map.addLayer(googleLayer);
+	//map.addLayer(googleLayer);
 	googleHybridLayer = new L.Google('HYBRID');
 	tempLayer = L.tileLayer.wms(baseDomainUrl+mapserverExecutable+"?map="+mapFileLocation, {
-		layers:  'sweden_temps,sweden_temps_iso',
+		layers:  'sweden_temps,sweden_temps_iso,sweden',
 		format:'image/png; mode=24bit',
 		transparent:'true',
 		opacity: initOpacity
@@ -34,7 +34,11 @@ function init(){
 			return new L.DivIcon({ html: "<div><span>"+clusterTemp+"</span></div>", className: 'marker-cluster', iconSize: new L.Point(40, 40) });
 		},
 		//Disable all of the defaults:
-		spiderfyOnMaxZoom: false, showCoverageOnHover: false, zoomToBoundsOnClick: true, singleMarkerMode:true
+		spiderfyOnMaxZoom: true, 
+		showCoverageOnHover: false, 
+		zoomToBoundsOnClick: true, 
+		singleMarkerMode:true,
+		spiderfyDistanceMultiplier:5
 	});
 	
 	//load the geojson
@@ -92,13 +96,35 @@ function init(){
 				    "Heatmap": tempLayer
 				    ,"Temperature points": markers
 				};
-				var layers=L.control.layers(baseMaps, overlayMaps);
+				layers=L.control.layers(baseMaps, overlayMaps);
 				map.addControl(layers);
-				map.addControl(new L.Control.Permalink({text: '<img title="Ger dig tillgång till en url som leder till aktuell vy" src="images/book.png"/>', layers: layers, position:'bottomright'}));
+				map.addControl(new L.Control.Attribution({prefix: '<a href="javascript:createBookmark()"><img title="Ger dig tillgång till en url som leder till aktuell vy" src="images/book.png"/></a>', position:'bottomright'}));
 				map.addControl(new L.Control.Attribution({prefix:'<a href="javascript:saveExtent()"><img id="setCookie" title="Sparar aktuell vy och gör sätter kartsidan till startsida på temperatur.nu" src="images/plus.png"/></a>', position:'bottomright'}));
 				map.addControl(new L.Control.Attribution({prefix:'<a href="javascript:unSetExtent()"><img id="unSetCookie" title="Tar bort sparad vy kartan som startsida." src="images/minus.png"/></a>', position:'bottomright'}));
 				map.addControl(new L.Control.Attribution({prefix:'<a href="javascript:openLegend()"><img id="openLegend" title="Öppen legend" src="images/list1.png"/></a>', position:'bottomright'}));
+				//If cookie is set load extent from cookie
 				loadExtent();
+				//If url parameters are set load extent from url parameters
+				var a=window.location.hash.slice(1).split("&");
+				if (a!=""){
+					//Parse url parameters
+					//Set map view and zoom
+					var params=Object;
+					for (var i=0;i<a.length;i++){
+						params[a[i].split("=")[0]]=a[i].split("=")[1];
+					}
+					map.setView(new L.LatLng(params.lat, params.lon), params.zoom);
+					//Set default baselayer
+					for (var lay in layers._layers){
+						if (!layers._layers[lay].overlay && !map.hasLayer(layers._layers[lay].layer) && layers._layers[lay].name==params.layer ){
+							map.addLayer(layers._layers[lay].layer);
+						} else if (!layers._layers[lay].overlay && map.hasLayer(layers._layers[lay].layer)) {
+							map.removeLayer(layers._layers[lay].layer);
+						}
+					}		
+				} else {
+					map.addLayer(googleHybridLayer);
+				}
 			}
 	);
 }
@@ -150,3 +176,63 @@ function openLegend(){
 	$( "#legend" ).dialog({width: 180, resizable:false, position:{my:"right top", at:"right top+10%", of:"#map"}});
 }
 
+
+function createBookmark(){
+	var center = _round_point(map.getCenter());
+	var zoom=map.getZoom();
+	var currLayer="";
+	for (var lay in layers._layers){
+		if (!layers._layers[lay].overlay && map.hasLayer(layers._layers[lay].layer)){
+			var currLayer=currLayer+layers._layers[lay].name;
+		}
+	}
+	var url=window.location.href.split('#')[0]+"#lat="+center.lat+"&lon="+center.lng+"&zoom="+zoom+"&layer="+currLayer;
+	var link="<a href='"+url+"' target='_blank'><img title='Verkställ url (öppnar urlen i nuvarande fönster)' src='images/tick2.png'/></a>";
+	link+="<a href='javascript:bookmarkurl(\""+url+"\")'><img title='Bokmärk url/lägg till url i favoriter' src='images/book.png'/></a><br/>";
+	link+="<input id='bmurl' type='text' value='"+url+"' readonly='readonly'/><br/>";
+	link+="Klicka i fältet nedan och tryck CTRL-C för att kopiera adressen";
+	$("#bookmark").html(link);
+	$("#bookmark").dialog({resizable:false, position:{my:"right bottom", at:"right bottom-25%", of:"#map"}});
+	$("#bmurl").focus();
+	$("#bmurl").select();
+}
+
+
+function _round_point (point) {
+	var bounds = map.getBounds(), size = map.getSize();
+	var ne = bounds.getNorthEast(), sw = bounds.getSouthWest();
+
+	var round = function (x, p) {
+		if (p == 0) return x;
+		shift = 1;
+		while (p < 1 && p > -1) {
+			x *= 10;
+			p *= 10;
+			shift *= 10;
+		}
+		return Math.floor(x)/shift;
+	}
+	point.lat = round(point.lat, (ne.lat - sw.lat) / size.y);
+	point.lng = round(point.lng, (ne.lng - sw.lng) / size.x);
+	return point;
+}
+
+
+function bookmarkurl(url) {
+    title = "Karta på temperatur.nu";
+    if (window.sidebar) // firefox
+            window.sidebar.addPanel(title, url, "");
+    else if(window.opera && window.print){ // opera
+            var elem = document.createElement('a');
+            elem.setAttribute('href',url);
+            elem.setAttribute('title',title);
+            elem.setAttribute('rel','sidebar');
+            elem.click();
+    }
+    else if(document.all)// ie
+            window.external.AddFavorite(url, title);
+	else // for other browsers which does not support
+	   { 
+	        alert('Please hold CTRL+D and click the link to bookmark it in your browser.');
+	   }
+}

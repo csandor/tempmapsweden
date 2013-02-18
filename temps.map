@@ -17,7 +17,7 @@ WEB
   METADATA
     "wms_title"     "Sweden Temperatures WMS"  ##required
     "wms_onlineresource" "http://viamap.dyndns.org:81/cgi-bin/mapservEcw?map=/home/viamap/temperature/temps.map"   ##required
-    "wms_srs"       "EPSG:3857 EPSG:900913"  ##recommended
+    "wms_srs"       "EPSG:3857 EPSG:3785"  ##recommended
   END
 END
 
@@ -38,9 +38,9 @@ LAYER
        TYPE RASTER
        STATUS ON
        DUMP TRUE
-       DATA "data/temps_recolor.tiff"
+       DATA "temps_recolor.tiff"
        PROJECTION
-           "init=epsg:900913"
+           "init=epsg:3857"
        END
 
 
@@ -58,44 +58,72 @@ LAYER
            COLOR 255 0 0
        END
 END #Layer
+
 LAYER
-NAME sweden_temps_iso
-STATUS ON
-TYPE LINE
-DATA "data/temps_contour_gm.shp"
-TRANSPARENCY ALPHA
-LABELITEM "temp"
-METADATA
-    "wms_title"             "Sweden Temperatures Map Isolines"
-    "wms_srs"               "EPSG:3857 EPSG:3785"
-    "wms_name"              "sweden_temps"
-    "wms_format"            "image/png image/jpeg"
-    "wms_extent"            "1228967.178 7408079.864 2700154.132 10791288.160"
-    "wms_onlineresource"    "http://www.temperatur.nu/cgi-bin/mapserv?map=/var/mapdata/temps.map"
+	NAME sweden_temps_iso
+	STATUS ON
+	TYPE LINE
+	DATA temps_contour_gm
+	TRANSPARENCY ALPHA
+	LABELITEM "temp"
+	METADATA
+		"wms_title"             "Sweden Temperatures Map Isolines"
+		"wms_srs"               "EPSG:3857 EPSG:3785"
+		"wms_name"              "sweden_temps"
+		"wms_format"            "image/png image/jpeg"
+		"wms_extent"            "1228967.178 7408079.864 2700154.132 10791288.160"
+		"wms_onlineresource"    "http://www.temperatur.nu/cgi-bin/mapserv?map=/var/mapdata/temps.map"
+	END
+
+	CLASS
+		STYLE
+			COLOR 150 150 150
+			WIDTH 1
+			ANTIALIAS TRUE
+		END
+		LABEL
+			COLOR  0 0 0
+			OUTLINECOLOR 255 255 255
+			OUTLINEWIDTH 1
+			FONT "verdana-bold"
+			BUFFER 4
+			TYPE truetype
+			SIZE 6
+			ANGLE follow
+			POSITION AUTO
+			PARTIALS FALSE
+			ANTIALIAS TRUE
+			REPEATDISTANCE 120
+		END
+	END
 END
 
-CLASS
-STYLE
-    COLOR 150 150 150
-    WIDTH 1
-    ANTIALIAS TRUE
+
+LAYER
+	NAME sweden
+	STATUS ON
+	TYPE POLYGON
+	DATA sweden
+	TRANSPARENCY ALPHA
+	METADATA
+		"wms_title"             "Sweden Temperatures Map Country Border"
+		"wms_srs"               "EPSG:3857 EPSG:3785"
+		"wms_name"              "sweden"
+		"wms_format"            "image/png image/jpeg"
+		"wms_extent"            "1228967.178 7408079.864 2700154.132 10791288.160"
+		"wms_onlineresource"    "http://www.temperatur.nu/cgi-bin/mapserv?map=/var/mapdata/temps.map"
+	END
+
+	CLASS
+		STYLE
+			OUTLINECOLOR 150 0 0
+			WIDTH 1
+			ANTIALIAS TRUE
+		END
+	END
 END
-LABEL
-COLOR  0 0 0
-OUTLINECOLOR 255 255 255
-OUTLINEWIDTH 1
-FONT "verdana-bold"
-BUFFER 4
-TYPE truetype
-SIZE 6
-ANGLE follow
-POSITION AUTO
-PARTIALS FALSE
-ANTIALIAS TRUE
-REPEATDISTANCE 120
-END
-END
-END
+
+
 
 END # Map File
 

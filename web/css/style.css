@@ -65,3 +65,17 @@
 	width:2em;
 	height:1em;
 }
+
+#bookmark {
+	font-size: 0.8em;
+}
+
+
+#bookmark img{
+	margin-left: 5px;
+	margin-right:5px;
+}
+
+#bookmark input{
+	width:95%;
+}
