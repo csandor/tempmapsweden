@@ -104,27 +104,6 @@ function init(){
 				map.addControl(new L.Control.Attribution({prefix:'<a href="javascript:openLegend()"><img id="openLegend" title="Öppen legend" src="images/list1.png"/></a>', position:'bottomright'}));
 				//If cookie is set load extent from cookie
 				loadExtent();
-				//If url parameters are set load extent from url parameters
-				var a=window.location.hash.slice(1).split("&");
-				if (a!=""){
-					//Parse url parameters
-					//Set map view and zoom
-					var params=Object;
-					for (var i=0;i<a.length;i++){
-						params[a[i].split("=")[0]]=a[i].split("=")[1];
-					}
-					map.setView(new L.LatLng(params.lat, params.lon), params.zoom);
-					//Set default baselayer
-					for (var lay in layers._layers){
-						if (!layers._layers[lay].overlay && !map.hasLayer(layers._layers[lay].layer) && layers._layers[lay].name==params.layer ){
-							map.addLayer(layers._layers[lay].layer);
-						} else if (!layers._layers[lay].overlay && map.hasLayer(layers._layers[lay].layer)) {
-							map.removeLayer(layers._layers[lay].layer);
-						}
-					}		
-				} else {
-					map.addLayer(googleHybridLayer);
-				}
 			}
 	);
 }
@@ -143,12 +122,13 @@ function updateInfo(feature){
     				"<br /><a href='javascript:map.panTo(["+feature.geometry.coordinates[1]+","+feature.geometry.coordinates[0]+"])'><img title='Zooma in "+feature.properties.name+"' id='zoomTo' src='images/location plus.png'/></a>"+
     				"<br /><a href='javascript:map.fitBounds([[55.24,11.04],[69.13,24.26]])'><img title='Zooma ut och centrera kartan' id='zoomToExtent' src='images/picture.png'/></a>"+
     				"</div>"+
-    				"<p>info@temperature.nu</p>"
+    				"<p>info@temperature.nu</p>"+
+    				"<p id='featalias' style='display:none;'>"+feature.properties.alias+"</p>"
     		);
     		$("#mapinfo").css("visibility","visible");
     		$( "#mapinfo" ).dialog({title:feature.properties.name,resizable:false, position:{my:"right top", at:"right top+10%", of:"#map"}});
         }
-	});	
+	});
 }
 
 
@@ -156,18 +136,94 @@ function saveExtent(){
 	var sw="[["+map.getBounds()._southWest.lat+","+map.getBounds()._southWest.lng+"]";
 	var ne="["+map.getBounds()._northEast.lat+","+map.getBounds()._northEast.lng+"]]";
 	$.cookie("extent", sw+","+ne,{ expires: 100 });
+	if ($("#mapinfo").dialog("isOpen")){
+		var alias=$("#featalias").html();
+		$.cookie("alias",alias,{ expires: 100 });
+	} else {
+		$.removeCookie('alias');
+	}
+	
+	
+	toast("Kartvyn har sparats");	
 }
 
-function loadExtent(){	
+function loadExtent(){
+	
 	var extent=$.cookie("extent");
-	if(eval(extent)){
+	
+	//If url parameters are set load extent from url parameters
+	var a=window.location.hash.slice(1).split("&");
+	var params=Object;
+	
+	if (a!=""){
+		//Parse url parameters
+		//Set map view and zoom
+		for (var i=0;i<a.length;i++){
+			params[a[i].split("=")[0]]=a[i].split("=")[1];
+		}
+		//map.setView(new L.LatLng(params.lat, params.lon), params.zoom);
+		//Set default baselayer
+		for (var lay in layers._layers){
+			if (!layers._layers[lay].overlay && !map.hasLayer(layers._layers[lay].layer) && layers._layers[lay].name==params.layer ){
+				map.addLayer(layers._layers[lay].layer);
+			} else if (!layers._layers[lay].overlay && map.hasLayer(layers._layers[lay].layer)) {
+				map.removeLayer(layers._layers[lay].layer);
+			}
+		}		
+	} else {
+		map.addLayer(googleHybridLayer);
+	}
+	
+	if (params.lat && params.lon && params.zoom){
+		map.setView(new L.LatLng(params.lat, params.lon), params.zoom);
+		if (params.alias){
+			var feature=getFeatureByAlias(params.alias);
+			updateInfo(feature);
+		}
+	} else if(eval(extent)){
 		map.fitBounds(eval(extent));
+		if ($.cookie("alias")){
+			var feature=getFeatureByAlias($.cookie("alias"));
+			updateInfo(feature);
+		}
 	}	
+}
+
+function getFeatureByAlias(alias){
+	for (var feature in tempPoints._layers){
+		if (tempPoints._layers[feature].feature.properties.alias==alias) return tempPoints._layers[feature].feature;
+	}
+	return false;
 }
 
 
 function unSetExtent(){
 	$.removeCookie('extent');
+	$.removeCookie('alias');
+	toast("Sparade kartvy bort");
+}
+
+function toast(toastText){
+	//$("#toast").css("visibility","visible");
+	$( "#toast" ).dialog({
+		  title:toastText,
+		  resizable:false, 
+		  height:0,
+		  position:{my:"centre", at:"centre", of:"#map"},
+		  show: {
+   	        effect: "fade",
+   	        duration: 200
+   	      },
+   	      hide: {
+   	          effect: "fade",
+   	          duration: 200
+   	      },
+   	      dialogClass: "no-close",
+   	     });
+	$("#toast.ui-dialog-content").css("display","none");
+	setTimeout(function(){
+		$("#toast").dialog("close");
+	},700);
 }
 
 
@@ -186,7 +242,11 @@ function createBookmark(){
 			var currLayer=currLayer+layers._layers[lay].name;
 		}
 	}
+	if ($("#mapinfo").dialog("isOpen")){
+		var alias=$("#featalias").html();
+	}
 	var url=window.location.href.split('#')[0]+"#lat="+center.lat+"&lon="+center.lng+"&zoom="+zoom+"&layer="+currLayer;
+	if (alias) url += "&alias="+alias;
 	var link="<a href='"+url+"' target='_blank'><img title='Verkställ url (öppnar urlen i nuvarande fönster)' src='images/tick2.png'/></a>";
 	link+="<a href='javascript:bookmarkurl(\""+url+"\")'><img title='Bokmärk url/lägg till url i favoriter' src='images/book.png'/></a><br/>";
 	link+="<input id='bmurl' type='text' value='"+url+"' readonly='readonly'/><br/>";

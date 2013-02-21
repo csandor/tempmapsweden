@@ -79,3 +79,13 @@
 #bookmark input{
 	width:95%;
 }
+
+.no-close .ui-dialog-titlebar-close {
+  display: none;
+}
+
+.no-close .ui-dialog-content {
+  display: none;
+}
+
+
