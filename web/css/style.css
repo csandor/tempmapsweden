@@ -1,5 +1,12 @@
-a img {border: none;} 
-
+a {
+	outline:none;
+}
+a img {
+	border: none;
+} 
+#legend a{
+	text-decoration:none;	
+}
 
 #map, #container {
 	height: 700px;
