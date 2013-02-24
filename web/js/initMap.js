@@ -3,7 +3,7 @@ var map,googleLayer,tempLayer,tempPoints,markers,layers;
 function init(){
 	
 	$(function (){
-		$( document ).tooltip();	
+		$( document ).tooltip();
 	});
 	
     map = new L.Map('map', {
@@ -104,6 +104,7 @@ function init(){
 				map.addControl(new L.Control.Attribution({prefix:'<a href="javascript:openLegend()"><img id="openLegend" title="Öppen legend" src="images/list1.png"/></a>', position:'bottomright'}));
 				//If cookie is set load extent from cookie
 				loadExtent();
+				$("#mapinfo").dialog({ autoOpen: false });
 			}
 	);
 }
@@ -119,16 +120,25 @@ function updateInfo(feature){
     				"<img src='"+graph[0].textContent+"' class='graph'/>" +
     				"<div class='dataPane'>"+
     				"<img title='Temperatur på den här platsen' src='images/temperature.png'/>"+feature.properties.temperature+"&#8451;"+
-    				"<br /><a href='javascript:map.panTo(["+feature.geometry.coordinates[1]+","+feature.geometry.coordinates[0]+"])'><img title='Zooma in "+feature.properties.name+"' id='zoomTo' src='images/location plus.png'/></a>"+
-    				"<br /><a href='javascript:map.fitBounds([[55.24,11.04],[69.13,24.26]])'><img title='Zooma ut och centrera kartan' id='zoomToExtent' src='images/picture.png'/></a>"+
+    				"<br /><a href='javascript:panToWrapper("+feature.geometry.coordinates[1]+","+feature.geometry.coordinates[0]+");'><img title='Zooma in "+feature.properties.name+"' id='zoomTo' src='images/location plus.png'/></a>"+
+    				"<br /><a href='javascript:fitBoundsWrapper();'><img title='Zooma ut och centrera kartan' id='zoomToExtent' src='images/picture.png'/></a>"+
     				"</div>"+
     				"<p>info@temperature.nu</p>"+
     				"<p id='featalias' style='display:none;'>"+feature.properties.alias+"</p>"
     		);
-    		$("#mapinfo").css("visibility","visible");
-    		$( "#mapinfo" ).dialog({title:feature.properties.name,resizable:false, position:{my:"right top", at:"right top+10%", of:"#map"}});
-        }
+    		//$("#mapinfo").dialog( "option", "autoOpen", true );
+    		$( "#mapinfo" ).dialog({autoOpen:true,title:feature.properties.name,resizable:false, position:{my:"right top", at:"right top+10%", of:"#map"}});
+        },
+	    error:function(){alert("Cross domain AJAX request failed!");}
 	});
+}
+
+function panToWrapper(lat,lon){
+	map.setView([lat,lon],13);
+}
+
+function fitBoundsWrapper(){
+	map.fitBounds([[55.24,11.04],[69.13,24.26]]);
 }
 
 
@@ -228,7 +238,7 @@ function toast(toastText){
 
 
 function openLegend(){
-	$("#legend").css("visibility","visible");
+	//$("#legend").css("visibility","visible");
 	$( "#legend" ).dialog({width: 180, resizable:false, position:{my:"right top", at:"right top+10%", of:"#map"}});
 }
 
